@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LightGSM</title>
+</head>
+<body>
+    <h1>LinuxGSM Panel</h1>
+
+    <div id="servers"></div>
+
+    <script>
+        const servers = ["kingmc", "moviemc", "springmc", "trraria", "ciaranvs"];
+    
+        async function sendCommand(server, action) {
+            const res = await fetch(`/command/${server}/${action}`, { method: 'POST' });
+            const data = await res.json();
+            alert(data.output);
+        }
+    
+        async function updateConsole(server) {
+            const res = await fetch(`/console/${server}`);
+            const data = await res.json();
+            document.getElementById(`${server}-console`).value = data.output;
+        }
+    
+        function createServerControls(server) {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <h2>${server}</h2>
+                <button onclick="sendCommand('${server}', 'start')">Start</button>
+                <button onclick="sendCommand('${server}', 'stop')">Stop</button>
+                <button onclick="sendCommand('${server}', 'restart')">Restart</button>
+                <br/><br/>
+                <textarea id="${server}-console" rows="10" cols="80" readonly></textarea>
+                <hr/>
+            `;
+            document.getElementById('servers').appendChild(div);
+            
+            // Update console every 5 seconds
+            setInterval(() => updateConsole(server), 5000);
+        }
+    
+        servers.forEach(createServerControls);
+    </script>    
+</body>
+</html>
